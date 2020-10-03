@@ -4,6 +4,10 @@ COMMON_PATH := device/MTK/common_mt676_
 # For building with minimal manifest
 ALLOW_MISSING_DEPENDENCIES := true
 
+# Bootloader
+TARGET_NO_BOOTLOADER := true
+TARGET_BOOTLOADER_BOARD_NAME := $(TARGET_BOARD_PLATFORM)
+
 # Architecture
 BOARD_HAS_MTK_HARDWARE := true
 MTK_HARDWARE := true
@@ -86,6 +90,9 @@ TARGET_RECOVERY_LCD_BACKLIGHT_PATH := \"/sys/class/leds/lcd-backlight/brightness
 ########
 # TWRP #
 ########
+
+# VERSION
+TW_DEVICE_VERSION := TEST_MRMAZAK_10
 
 # Display
 TW_BRIGHTNESS_PATH := /sys/class/leds/lcd-backlight/brightness
