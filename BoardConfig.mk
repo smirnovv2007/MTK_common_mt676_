@@ -86,13 +86,16 @@ RECOVERY_GRAPHICS_USE_LINELENGTH := true
 TARGET_USE_CUSTOM_LUN_FILE_PATH := /sys/devices/platform/mt_usb/musb-hdrc.0.auto/gadget/lun%d/file
 TARGET_DISABLE_TRIPLE_BUFFERING := false
 TARGET_RECOVERY_LCD_BACKLIGHT_PATH := \"/sys/class/leds/lcd-backlight/brightness\"
+TARGET_RECOVERY_DEVICE_MODULES += libpuresoftkeymasterdevice
+TARGET_RECOVERY_DEVICE_MODULES += ashmemd_aidl_interface-cpp
+TARGET_RECOVERY_DEVICE_MODULES += libashmemd_client
 
 ########
 # TWRP #
 ########
 
 # VERSION
-TW_DEVICE_VERSION := TEST_MRMAZAK_10
+TW_DEVICE_VERSION := TEST_MRMAZAK_20
 
 # Display
 TW_BRIGHTNESS_PATH := /sys/class/leds/lcd-backlight/brightness
@@ -106,12 +109,19 @@ TW_SCREEN_BLANK_ON_BOOT := true
 TW_CUSTOM_CPU_TEMP_PATH := /sys/devices/virtual/thermal/thermal_zone1/temp
 TW_USE_TOOLBOX := true
 TW_USE_MODEL_HARDWARE_ID_FOR_DEVICE_ID := true
+TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libpuresoftkeymasterdevice.so 
+TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/libashmemd_client.so 
+TW_RECOVERY_ADDITIONAL_RELINK_LIBRARY_FILES += $(TARGET_OUT_SHARED_LIBRARIES)/ashmemd_aidl_interface-cpp.so
 
 # Excludes
 TW_EXCLUDE_TWRPAPP := true
 
 # Crypto
 TW_INCLUDE_CRYPTO := true
+# TW_INCLUDE_CRYPTO := false
+TW_INCLUDE_CRYPTO_FBE := true
+TW_INCLUDE_FBE_METADATA_DECRYPT := true
+BOARD_USES_METADATA_PARTITION := true
 TW_CRYPTO_FS_TYPE := "ext4"
 TW_CRYPTO_REAL_BLKDEV := "/dev/block/platform/bootdevice/by-name/userdata"
 TW_CRYPTO_MNT_POINT := "/data"
@@ -120,7 +130,6 @@ TW_CRYPTO_FS_OPTIONS := "nosuid,nodev,noatime,discard,noauto_da_alloc,barrier=0,
 # Debug
 TWRP_INCLUDE_LOGCAT := true
 TARGET_USES_LOGD := true
-TW_CRYPTO_SYSTEM_VOLD_DEBUG := true
 
 # Storage
 TW_HAS_MTP := true
