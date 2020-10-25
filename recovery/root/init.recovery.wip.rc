@@ -25,8 +25,8 @@
 # ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #
 
-import /init.recovery.qcom_decrypt.rc
-
+#import /init.recovery.qcom_decrypt.rc
+import /microtrust.rc
 
 on init
     mkdir /config
@@ -44,6 +44,19 @@ on init
     setprop sys.usb.ffs.aio_compat 1
     setprop crypto.ready 1
 
+on late-fs
+
+    # HALs required before storage encryption can get unlocked (FBE/FDE)
+    class_start early_hal
+
+    start vendor.keymaster-3-0
+    start vendor.keymaster-3-0-trustonic
+    start vendor.keymaster-4-0
+    start vendor.keymaster-4-0-trustonic
+    start vendor.keymaster-4-0-beanpod
+    start vendor.keymaster-4-0-trustkernel
+    start keymaster_attestation-1-1
+
 service beanpod_check_keybox_service /vendor/bin/bp_kmsetkey_ca -c
     class late_start
     user root
@@ -58,6 +71,55 @@ service keymaster_attestation-1-1 /system/bin/vendor.mediatek.hardware.keymaster
     group root
     disabled
     seclabel u:r:recovery:s0
+
+on nonencrypted
+    class_start main
+    class_start late_start
+
+on property:vold.decrypt=trigger_default_encryption
+    start defaultcrypto
+
+on property:vold.decrypt=trigger_encryption
+    start surfaceflinger
+    start encrypt
+
+on property:sys.init_log_level=*
+    loglevel ${sys.init_log_level}
+
+on property:vold.decrypt=trigger_reset_main
+    class_reset main
+
+on property:vold.decrypt=trigger_load_persist_props
+    load_persist_props
+    start logd
+    start logd-reinit
+
+on property:vold.decrypt=trigger_post_fs_data
+    trigger post-fs-data
+    trigger zygote-start
+
+on property:vold.decrypt=trigger_restart_min_framework
+    # A/B update verifier that marks a successful boot.
+    exec_start update_verifier
+    class_start main
+
+on property:vold.decrypt=trigger_restart_framework
+    stop surfaceflinger
+    start surfaceflinger
+    # A/B update verifier that marks a successful boot.
+    exec_start update_verifier
+    class_start main
+    class_start late_start
+
+on property:vold.decrypt=trigger_shutdown_framework
+    class_reset late_start
+    class_reset main
+
+# One shot invocation to deal with encrypted volume.
+on defaultcrypto
+    exec - root -- /system/bin/vdc --wait cryptfs mountdefaultencrypted
+    # vold will set vold.decrypt to trigger_restart_framework (default
+    # encryption) or trigger_restart_min_framework (other encryption)
     
 on property:ro.debuggable=0
     # distinguish USB shoulde connect or not, i.e. CDP vs SDP

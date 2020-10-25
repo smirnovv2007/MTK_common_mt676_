@@ -1,0 +1,30 @@
+# WIP TWRP INCLUDE LIBASHMEM
+
+import /trustkernel.rc
+import /init.recovery.qcom_decrypt.rc
+
+on init
+    # Create a more standard /dev/block layout for our scripts
+    symlink /dev/block/platform/bootdevice /dev/block/bootdevice
+
+    mkdir /vendor/lib64 0700 root root
+    mkdir /vendor/lib64/hw 0700 root root
+    setprop crypto.ready 1
+
+on fs
+    # Support A/B feature for EMMC and UFS boot region
+    symlink /dev/block/sda /dev/block/mmcblk0boot0
+    symlink /dev/block/sdb /dev/block/mmcblk0boot1
+    symlink /dev/block/mmcblk0boot0 /dev/block/platform/bootdevice/by-name/preloader_a
+    symlink /dev/block/mmcblk0boot1 /dev/block/platform/bootdevice/by-name/preloader_b
+    
+on property:crypto.ready=0
+    stop keymaster-3-0
+    stop gatekeeper-1-0
+    stop attestation-1-1
+
+on property:vendor.sys.listeners.registered=true
+    start keymaster-3-0
+    start gatekeeper-1-0
+    start attestation-1-1
+
