@@ -92,7 +92,7 @@ TARGET_RECOVERY_LCD_BACKLIGHT_PATH := \"/sys/class/leds/lcd-backlight/brightness
 ########
 
 # VERSION
-TW_DEVICE_VERSION := TEST_MRMAZAK_10
+TW_DEVICE_VERSION := Test by smirnovv2007
 
 # Display
 TW_BRIGHTNESS_PATH := /sys/class/leds/lcd-backlight/brightness
@@ -137,4 +137,4 @@ TW_NO_USB_STORAGE := false
 
 # Languages
 TW_EXTRA_LANGUAGES := true
-TW_DEFAULT_LANGUAGE := en
+TW_DEFAULT_LANGUAGE := ru
